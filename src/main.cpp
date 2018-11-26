@@ -173,7 +173,7 @@ bool lane_switch_ok(vector<double> lane_db, double car_s)
 	// check lane 0 cars
 	for (int j=0; j<lane_db.size();j++)
 	{
-		if (abs(lane_db[j] - car_s) < 18)
+		if (abs(lane_db[j] - car_s) < 22)
 		{
 			ok_lane = false;
 			break;
@@ -367,12 +367,14 @@ int main() {
 					check_car_s += ((double) prev_size*0.02*check_speed);
 
 					// Is the car going to be < 30meters in front of you in the next time slice?
-					if ((check_car_s > car_s) && (check_car_s-car_s) < 30)
+					if ((check_car_s > car_s) && (check_car_s-car_s) < 35)
 					{
 
+						//cout << (check_car_s-car_s) << endl;
+
 						brake_mulitpler = 1.0;
-						if ((check_car_s-car_s) < 10)
-							brake_mulitpler = 2.0;
+						if ((check_car_s-car_s) < 20)
+							brake_mulitpler = 5.0;
 
 						// then we're going to be too close
 						too_close = true;
