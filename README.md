@@ -1,11 +1,52 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
    
-### Simulator.
-You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).
-
+In this project, we configure and execute a path planner to navigate a highway with multiple vehicles.   
+   
 ### Goals
 In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 10 m/s^3.
+   
+### Reflection
+
+The software implemented uses a function to limit acceleration in both Frenet S and D dimensions. It also uses the recommended Spline class to generate smooth transistion when lane switching. In the project lessons, it was recommended that only moving to lane 0 was the only option. And that could create a scenario that the car would take 10 mins or more to complete the track (got caught in a traffic jamb on lane zero. Instead I implemented a cost function logic:
+	
+   1. Strong bias to stay in the left lane
+	
+   2. if there is no cars in the next lane, move to it.
+	
+   3. only allow one lane changes per lane switch/time step
+
+This provide successful and I was able to consistency navigate the track in under 6 minutes.
+<img src="output/running_example.png" width="480" alt="Combined Image" />
+
+To check for robustness, I was able to run for an extended period of time:
+<img src="output/running_long.png" width="480" alt="Combined Image" />
+
+##### What are issues with this implementation?
+
+a. If you're in a traffic jam, you are constantly deaccelerating and accelerating. Though jerk is acceptable and within limits, it would be better to either match the speed of the traffic OR find a way to navigate through the traffic by multiple lane switches.
+
+b. The car lane database I created ONLY looks at a rectangle-area of collision avoidance. It need to incorporate the velocities of the cars close by to ensure 100% collision free trajectories. Currently it is sufficient for the vehicle dynamics of the current model, BUT there are times I would cut off another vehicle.
+
+c. The model needs to account for sudden lane changes from OTHER vehicles. A couple of times I switched lanes to go around a vehicle, then suddenly that same vehicle switches to my new lane, in essence CUTTING ME OFF and attempting to "block me". That would require a emergency stop, but likely exceeding the acceleration limits define by the requirements. That shows the current vehicle dyanmics model (of the other cars) is incomplete.
+
+d. Lastly a better cost function can be used. For example, what can improve lane switching is looking at multiple cars in front of you in the same lane to assess traffic conditions/density. This would require a more sophisticated cost function than the rules I have used. Of course in reality, LIDAR data would shadow any cars in front of the immediate car I detected, thus need more technology to identify all cars/objects on the road.
+   
+   
+### Rubric Summary
+
+The code compiles correctly.
+   
+   
+   
+   
+   
+   
+   
+   
+   
+### Simulator.
+You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).
 
 #### The map of the highway is in data/highway_map.txt
 Each waypoint in the list contains  [x,y,s,dx,dy] values. x and y are the waypoint's map coordinate position, the s value is the distance along the road to get to that waypoint in meters, the dx and dy values define the unit normal vector pointing outward of the highway loop.
