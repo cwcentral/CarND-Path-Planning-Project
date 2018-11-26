@@ -374,7 +374,7 @@ int main() {
 
 						brake_mulitpler = 1.0;
 						if ((check_car_s-car_s) < 20)
-							brake_mulitpler = 5.0;
+							brake_mulitpler = 4.0;
 
 						// then we're going to be too close
 						too_close = true;
