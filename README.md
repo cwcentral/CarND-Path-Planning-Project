@@ -57,29 +57,29 @@ d. Lastly a better cost function can be used. For example, what can improve lane
    
 ### Rubric Summary
 
-(OK) The code compiles correctly.
-(OK) The car is able to drive at least 4.32 miles without incident.
+:heavy_check_mark: The code compiles correctly.
+:heavy_check_mark: The car is able to drive at least 4.32 miles without incident.
 
 *Provided in the video link above*
 
-(OK) The car drives according to the speed limit (50mph)
+:heavy_check_mark: The car drives according to the speed limit (50mph)
 
 *See software, main.cpp, lines 441*
 
-(OK) Max Acceleration and Jerk are not Exceeded (+- 10m/s^2).
+:heavy_check_mark: Max Acceleration and Jerk are not Exceeded (+- 10m/s^2).
 
 *See software, main.cpp, lines 441*
 
-(OK) Car does not have collisions
+:heavy_check_mark: Car does not have collisions
 
 *Provided in the video link above*
 
 *There maybe conditions where computer vehicles decides to cut you off and block you intentionally, thus needing a emergency stop that will exceed jerk requirements*
 
-(OK) The car stays in its lane, except for the time between changing lanes
-(OK) The car is able to change lanes
+:heavy_check_mark: The car stays in its lane, except for the time between changing lanes
+:heavy_check_mark: The car is able to change lanes
 
-===============================================================================================================
+========================================================
 
    
 ### Simulator.
