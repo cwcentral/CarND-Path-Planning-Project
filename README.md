@@ -6,15 +6,37 @@ In this project, we configure and execute a path planner to navigate a highway w
 ### Goals
 In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 10 m/s^3.
    
-### Reflection
+### Implementation
 
-The software implemented uses a function to limit acceleration in both Frenet S and D dimensions. It also uses the recommended Spline class to generate smooth transistion when lane switching. In the project lessons, it was recommended that only moving to lane 0 was the only option. And that could create a scenario that the car would take 10 mins or more to complete the track (got caught in a traffic jamb on lane zero. Instead I implemented a cost function logic:
+The ego car uses a provided highway_map.csv to provide a set of waypoints on how to drive around the track. 
+The software looks at extending the current car's path by 50 points every 0.02 seconds via frenet space points:
+
+<img src="output/freenet.png" width="480" alt="Combined Image" />
+
+Step 1 (lines 315-425) I needed to decide on whether the car needs to change lanes or not. I implemented a logic function to express a cost in changing lanes:
+   1. Strong bias to switch to the farest most left lane, lane 0
 	
-   1. Strong bias to stay in the left lane
-	
-   2. if there is no cars in the next lane, move to it.
+   2. if there is zero cars detected in the next lane, move to it, it maybe left or right if I;m in lane 1.
 	
    3. only allow one lane changes per lane switch/time step
+   
+   By developing a database of what cars are in "what" lane, I was able to deteremine what was the nopen lane I should switch to IF I was coming upto a car in my lane within 30meters.
+   
+   
+Step 2 (lines 426-440) I needed to decide if I should slow down or speed up. If I detected a car in front of me and decided to see if I can change lanes, this would trigger logic to slow down. Otherwise I would always speed upto the max speed limit.
+
+Step 3 (lines 445-512) I need to create a smooth path to the next endpoint of my waypoint set. In order to create a smooth transition of points during lane changes and curves in the road, I extracted anchor points at the last position of the previous trajectory, the current position and 30, 60, and 90 meters in front of the ego car.
+
+Step 4 (lines 517-570) I convert the anchor points to local frame (pose of the car is (0,0), run a spline generator to create new points, then convert back to global frame with the current position of the car as 0,0. 
+
+The result was a path planner that changed changes smoothly, maintain speed and avoid collisions.
+
+[![Output](output/spline.png)](https://youtu.be/HMGEo_nn_6c "Click to Play Video")
+
+   
+### Reflection
+
+The software implemented uses a function to limit acceleration in both Frenet S and D dimensions. It also uses the recommended Spline class to generate smooth transistion when lane switching. In the project lessons, it was recommended that only moving to lane 0 was the only option. And that could create a scenario that the car would take 10 mins or more to complete the track (got caught in a traffic jamb on lane zero. 
 
 This provide successful and I was able to consistency navigate the track in under 6 minutes.
 <img src="output/running_example.png" width="480" alt="Combined Image" />
@@ -28,22 +50,37 @@ a. If you're in a traffic jam, you are constantly deaccelerating and acceleratin
 
 b. The car lane database I created ONLY looks at a rectangle-area of collision avoidance. It need to incorporate the velocities of the cars close by to ensure 100% collision free trajectories. Currently it is sufficient for the vehicle dynamics of the current model, BUT there are times I would cut off another vehicle.
 
-c. The model needs to account for sudden lane changes from OTHER vehicles. A couple of times I switched lanes to go around a vehicle, then suddenly that same vehicle switches to my new lane, in essence CUTTING ME OFF and attempting to "block me". That would require a emergency stop, but likely exceeding the acceleration limits define by the requirements. That shows the current vehicle dyanmics model (of the other cars) is incomplete.
+c. The model needs to account for sudden lane changes from OTHER vehicles. A couple of times I switched lanes to go around a vehicle, then suddenly that same vehicle switches to my new lane, in essence CUTTING ME OFF and attempting to "block me". That would require a emergency stop, but likely exceeding the acceleration limits define by the requirements. I currently use a braking multipler looking at the distance of the cars and appears to be sufficient, but likely not robust in all conditions. It also shows the current vehicle dyanmics model provided (of the other cars) is incomplete. 
 
 d. Lastly a better cost function can be used. For example, what can improve lane switching is looking at multiple cars in front of you in the same lane to assess traffic conditions/density. This would require a more sophisticated cost function than the rules I have used. Of course in reality, LIDAR data would shadow any cars in front of the immediate car I detected, thus need more technology to identify all cars/objects on the road.
    
    
 ### Rubric Summary
 
-The code compiles correctly.
-   
-   
-   
-   
-   
-   
-   
-   
+(OK) The code compiles correctly.
+(OK) The car is able to drive at least 4.32 miles without incident.
+
+*Provided in the video link above*
+
+(OK) The car drives according to the speed limit (50mph)
+
+*See software, main.cpp, lines 441*
+
+(OK) Max Acceleration and Jerk are not Exceeded (+- 10m/s^2).
+
+*See software, main.cpp, lines 441*
+
+(OK) Car does not have collisions
+
+*Provided in the video link above*
+
+*There maybe conditions where computer vehicles decides to cut you off and block you intentionally, thus needing a emergency stop that will exceed jerk requirements*
+
+(OK) The car stays in its lane, except for the time between changing lanes
+(OK) The car is able to change lanes
+
+===============================================================================================================
+
    
 ### Simulator.
 You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).
