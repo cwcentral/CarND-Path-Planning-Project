@@ -313,6 +313,9 @@ int main() {
 			// flag to notify when to SLOW down/ Speed up
 			bool too_close = false;
 
+			/////////////////////////////////////////////////////////////////////////////
+			// STEP 1. DO I need to change lanes?
+			/////////////////////////////////////////////////////////////////////////////
 
 			// Were going to create a data base to see what cars are in what lanes
 			// this will be the basis of of a cost function
@@ -366,6 +369,11 @@ int main() {
 					// Is the car going to be < 30meters in front of you in the next time slice?
 					if ((check_car_s > car_s) && (check_car_s-car_s) < 30)
 					{
+
+						brake_mulitpler = 1.0;
+						if ((check_car_s-car_s) < 10)
+							brake_mulitpler = 2.0;
+
 						// then we're going to be too close
 						too_close = true;
 
@@ -420,19 +428,30 @@ int main() {
 				}
 			}
 
+			/////////////////////////////////////////////////////////////////////////////
+			// STEP 2. Should I change my speed?
+			/////////////////////////////////////////////////////////////////////////////
+
 			// After deciding if I need to change lanes,
 			// control speed.
 			if (too_close)
 			{
-				ref_vel -= 0.23;
+				ref_vel -= (0.23 * brake_mulitpler);
 			}
 			else if (ref_vel < 49.5)
 			{
 				ref_vel += 0.22;
 			}
 
+
+			/////////////////////////////////////////////////////////////////////////////
+			// STEP 3. What is m trajectory, aka path?
+			/////////////////////////////////////////////////////////////////////////////
+
+			//
 			// Now lets look at the position of the car and calculate the
-			// next set of waypoints SMOOTHLY.
+			// next set of waypoints SMOOTHLY into the lane I need to be in (can be the SAME lane)
+			//
 			vector<double> ptsx;
 			vector<double> ptsy;
 
@@ -496,6 +515,11 @@ int main() {
 			ptsy.push_back(next_wp1[1]);
 			ptsy.push_back(next_wp2[1]);
 
+
+			/////////////////////////////////////////////////////////////////////////////
+			// STEP 4. Generate smooth path of waypoints, aka spline
+			/////////////////////////////////////////////////////////////////////////////
+
 			// reference to current car origin frame (pose = origin)
 			for (int i=0; i< ptsx.size(); i++)
 			{
@@ -526,7 +550,7 @@ int main() {
 
 			double x_add_on = 0;
 
-			// ignore last set of points and create the new trajectory
+			// ignore last set of points and create the new trajectory against the current position of the car.
 			// Again this reference section Project.6
 			for(int i = 1; i < 50-prev_size; i++)
 			{
