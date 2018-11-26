@@ -11,7 +11,7 @@ In this project your goal is to safely navigate around a virtual highway with ot
 The ego car uses a provided highway_map.csv to provide a set of waypoints on how to drive around the track. 
 The software looks at extending the current car's path by 50 points every 0.02 seconds via frenet space points:
 
-<img src="output/freenet.png" width="480" alt="Combined Image" />
+<img src="output/frenet.png" width="480" alt="Combined Image" />
 
 **Step 1 (lines 315-425)** I needed to decide on whether the car needs to change lanes or not. I implemented a logic function to express a cost in changing lanes:
 
