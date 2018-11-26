@@ -13,7 +13,8 @@ The software looks at extending the current car's path by 50 points every 0.02 s
 
 <img src="output/freenet.png" width="480" alt="Combined Image" />
 
-Step 1 (lines 315-425) I needed to decide on whether the car needs to change lanes or not. I implemented a logic function to express a cost in changing lanes:
+**Step 1 (lines 315-425)** I needed to decide on whether the car needs to change lanes or not. I implemented a logic function to express a cost in changing lanes:
+
    1. Strong bias to switch to the farest most left lane, lane 0
 	
    2. if there is zero cars detected in the next lane, move to it, it maybe left or right if I;m in lane 1.
@@ -23,11 +24,11 @@ Step 1 (lines 315-425) I needed to decide on whether the car needs to change lan
    By developing a database of what cars are in "what" lane, I was able to deteremine what was the nopen lane I should switch to IF I was coming upto a car in my lane within 30meters.
    
    
-Step 2 (lines 426-440) I needed to decide if I should slow down or speed up. If I detected a car in front of me and decided to see if I can change lanes, this would trigger logic to slow down. Otherwise I would always speed upto the max speed limit.
+**Step 2** (lines 426-440) I needed to decide if I should slow down or speed up. If I detected a car in front of me and decided to see if I can change lanes, this would trigger logic to slow down. Otherwise I would always speed upto the max speed limit.
 
-Step 3 (lines 445-512) I need to create a smooth path to the next endpoint of my waypoint set. In order to create a smooth transition of points during lane changes and curves in the road, I extracted anchor points at the last position of the previous trajectory, the current position and 30, 60, and 90 meters in front of the ego car.
+**Step 3** (lines 445-512) I need to create a smooth path to the next endpoint of my waypoint set. In order to create a smooth transition of points during lane changes and curves in the road, I extracted anchor points at the last position of the previous trajectory, the current position and 30, 60, and 90 meters in front of the ego car.
 
-Step 4 (lines 517-570) I convert the anchor points to local frame (pose of the car is (0,0), run a spline generator to create new points, then convert back to global frame with the current position of the car as 0,0. 
+**Step 4** (lines 517-570) I convert the anchor points to local frame (pose of the car is (0,0), run a spline generator to create new points, then convert back to global frame with the current position of the car as 0,0. 
 
 The result was a path planner that changed changes smoothly, maintain speed and avoid collisions.
 
@@ -58,9 +59,10 @@ d. Lastly a better cost function can be used. For example, what can improve lane
 ### Rubric Summary
 
 :heavy_check_mark: The code compiles correctly.
+
 :heavy_check_mark: The car is able to drive at least 4.32 miles without incident.
 
-*Provided in the video link above*
+*Provided in the video link below*
 
 :heavy_check_mark: The car drives according to the speed limit (50mph)
 
@@ -68,16 +70,21 @@ d. Lastly a better cost function can be used. For example, what can improve lane
 
 :heavy_check_mark: Max Acceleration and Jerk are not Exceeded (+- 10m/s^2).
 
-*See software, main.cpp, lines 441*
+*See software, main.cpp, lines 439/443*
 
 :heavy_check_mark: Car does not have collisions
 
-*Provided in the video link above*
+*Provided in the video link below*
 
 *There maybe conditions where computer vehicles decides to cut you off and block you intentionally, thus needing a emergency stop that will exceed jerk requirements*
 
 :heavy_check_mark: The car stays in its lane, except for the time between changing lanes
+
+*Provided in the video link below*
+
 :heavy_check_mark: The car is able to change lanes
+
+[![Output](output/spline.png)](https://youtu.be/oTzhtsaMQ0s "Click to Play Video")
 
 ========================================================
 
